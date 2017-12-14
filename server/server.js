@@ -23,7 +23,8 @@ app.get('/todos', (req, res) => {
         likes: [
             'Worship',
             'Programming',
-            'Sports'
+            'Sports',
+            'Testing'
         ]
     })
 })

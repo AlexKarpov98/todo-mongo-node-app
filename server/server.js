@@ -1,3 +1,5 @@
+require('./config/config');
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const { ObjectID } = require('mongodb');
@@ -8,16 +10,27 @@ let { Todo } = require('./models/todo');
 let { User } = require('./models/user');
 
 let app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT;
 
 app.use(bodyParser.json());
 
 app.post('/todos', (req, res) => {
-  new Todo({
-    text: req.body.text
-  }).save().then((doc) => 
-        res.send(doc), 
-        (e) => res.status(400).send(e));
+
+    var body = _.pick(req.body, ['text', 'completed']);
+    if(_.isBoolean(body.completed) && body.completed){
+        body.completedAt = new Date().getTime();
+    } else {
+        body.completed = false;
+        body.completedAt = null;
+    }
+    new Todo({
+        text: req.body.text,
+        completed: body.completed,
+        completedAt: body.completedAt
+    }).save().then((doc) => 
+            res.send(doc), 
+            (e) => res.status(400).send(e));
+    
 });
 
 app.get('/todos', (req, res) => {
@@ -56,9 +69,6 @@ app.delete('/todos/:id', (req, res) => {
 
 app.patch('/todos/:id', (req, res) => {
     var body = _.pick(req.body, ['text', 'completed']);
-
-    console.log(body);
-
     if(!ObjectID.isValid(req.params.id)) {
         res.status(404).send({error: 'Invalid ID'});
     } else {

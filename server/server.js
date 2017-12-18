@@ -23,14 +23,9 @@ app.post('/todos', (req, res) => {
         body.completed = false;
         body.completedAt = null;
     }
-    new Todo({
-        text: req.body.text,
-        completed: body.completed,
-        completedAt: body.completedAt
-    }).save().then((doc) => 
-            res.send(doc), 
-            (e) => res.status(400).send(e));
-    
+    new Todo(body).save()
+        .then((doc) => res.send(doc))
+        .catch((e)  => res.status(400).send(e));
 });
 
 app.get('/todos', (req, res) => {
@@ -84,6 +79,19 @@ app.patch('/todos/:id', (req, res) => {
                 res.send({todo});
             }).catch((e) => res.status(400).send())
     }
+});
+
+// POST /users
+
+app.post('/users', (req, res) => {
+    var body = _.pick(req.body, ['email', 'password']);
+    let user = new User(body);
+
+    user.save().then((user) => {
+        return user.generateAuthToken();
+    }).then((token) => {
+        res.header('x-auth', token).send(user);
+    }).catch((e) => res.status(400).send(e));
 });
 
 app.listen(port, () => {

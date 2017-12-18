@@ -1,6 +1,6 @@
 const env = process.env.NODE_ENV || 'development';
 
-console.log(`\n ENVIROMENT IS: \n --- ${env} --- \n`);
+console.log(`\n ENVIRONMENT IS: \n --- ${env} --- \n`);
 
 if(env === 'development') {
     process.env.PORT = 3000;
